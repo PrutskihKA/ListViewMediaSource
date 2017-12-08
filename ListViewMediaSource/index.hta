@@ -1,6 +1,6 @@
 ﻿<html>
 <head>
-<title>Слайдшоу</title> 
+<title>Слайдшоу</title>
 <hta:application applicationname=slideshow version=1.0
 		caption=no sysmenu=no scroll=no scrollflat=no
 		innerborder=no border=thin borderStyle=normal
@@ -25,15 +25,16 @@
 <script>
 //Переменные
 //Искать в директориях
-var ImagesList = new ListMediaSource();
-subdir(ImagesList, undefined, true);
+	var ImagesList = new ListMediaSource();
+	var ListChoose = new Array();
 //Images
 //FindOfSubDir = true;
 //-------------------------------------------------------------------------------------------------
 function find(array, value)
 {
 
-    for (var i = 0; i < array.length; i++) {
+	for (var i = 0; i < array.length; i++)
+	{
         if (array[i] == value) return i;
     }
 
@@ -147,34 +148,39 @@ function ShowList(MediaSource)
 //-------------------------------------------------------------------------------------------------
 function AddMediaSource(MediaSource)
 {
-this.MediaSource[this.Index ++] = MediaSource;
+	this.MediaSource[this.Index ++] = MediaSource;
 }
 
-function SortFileByType(ListMediaSource, path) {
+function SortFileByType(ListMediaSource, path)
+{
 
-	allfiles = new Enumerator(path.files);
-	
-  fso=new ActiveXObject('Scripting.fileSystemObject');
-  
- while(!allfiles.atEnd()) {
-	file=allfiles.item();
-	switch(fso.getExtensionName(file.path).toLowerCase())
-	{
-	 case'jpeg':case'jpg':case'png':case'gif':case'bmp':
-    FullPath = new String(file.ParentFolder);
-    FullPathLevelUp = new String(fso.GetParentFolderName(file.ParentFolder));
-    NameParent = FullPath.substr(FullPathLevelUp.length+1);
-   
-	  ListMediaSource.add(new MediaSource(NameParent,file.Path,"image"));	
+    allfiles = new Enumerator(path.files);
 
-	 break;
-		
-	 case'mp3':case'wav':case'wave':
-	 break;
-	}
-	allfiles.moveNext();
- }
+    fso = new ActiveXObject('Scripting.fileSystemObject');
 
+    while (!allfiles.atEnd()) {
+
+        file = allfiles.item();
+
+        switch (fso.getExtensionName(file.path).toLowerCase())
+        {
+            case 'jpeg': case 'jpg': case 'png': case 'gif': case 'bmp':
+
+                FullPath = new String(file.ParentFolder);
+                FullPathLevelUp = new String(fso.GetParentFolderName(file.ParentFolder));
+                NameParent = FullPath.substr(FullPathLevelUp.length + 1);
+
+                ListMediaSource.add(new MediaSource(NameParent, file.Path, "image"));
+
+                break;
+
+            case 'mp3': case 'wav': case 'wave':
+                break;
+        }
+
+        allfiles.moveNext();
+
+    }
 
 }
 
@@ -182,37 +188,174 @@ function SortFileByType(ListMediaSource, path) {
 //-------------------------------------------------------------------------------------------------
 function subdir(ListMediaSource, Path, FindOfSubDir)
 {
-	fso=new ActiveXObject('Scripting.fileSystemObject');
-	allfiles=new Enumerator(fso.getFolder('.').files);
+    fso = new ActiveXObject('Scripting.fileSystemObject');
+    allfiles = new Enumerator(fso.getFolder('.').files);
 
-	var CurrentPath;
+    var CurrentPath;
 
-	CurrentModeSeek = (FindOfSubDir!=undefined) ? CurrentModeSeek = FindOfSubDir : false;
-	CurrentPath = (Path!=undefined) ? CurrentPath = Path : CurrentPath=fso.getFolder('.');
+    CurrentModeSeek = (FindOfSubDir != undefined) ? CurrentModeSeek = FindOfSubDir : false;
+    CurrentPath = (Path != undefined) ? CurrentPath = Path : CurrentPath = fso.getFolder('.');
 
 
-	if (CurrentModeSeek)
-	{
-	var folder = fso.GetFolder(CurrentPath);
-	var subFlds = new Enumerator(folder.SubFolders);
-	for (; !subFlds.atEnd(); subFlds.moveNext()) 
-		{
-		subdirs=subFlds.item();
-		SortFileByType(ListMediaSource,CurrentPath);
-		subdir(ListMediaSource, subdirs); 
-		}
-	}
-	else
-	{
-		SortFileByType(ListMediaSource,CurrentPath);
-	} 	 
+    if (CurrentModeSeek) {
+        var folder = fso.GetFolder(CurrentPath);
+        var subFlds = new Enumerator(folder.SubFolders);
+        for (; !subFlds.atEnd(); subFlds.moveNext()) {
+            subdirs = subFlds.item();
+            SortFileByType(ListMediaSource, CurrentPath);
+            subdir(ListMediaSource, subdirs);
+        }
+    }
+    else {
+        SortFileByType(ListMediaSource, CurrentPath);
+    } 	 
 	
+ }
+
+function MediaFileShow(FileName)
+{
+
+	//FileNameRecode = finderrpath(FileName);
+	//alert(FileNameRecode);
+	//FileNameRecode = FileNameRecode.replace("\","\\");
+
+	videoheight = Math.ceil(screen.height / 3);
+
+	document.write("<td width='50%'>");
+	document.write("<OBJECT ID='MediaPlayer' WIDTH='100%' HEIGHT='" + videoheight + "' CLASSID='CLSID:22D6F312-B0F6-11D0-94AB-0080C74C7E95'");
+	document.write("STANDBY='Loading Windows Media Player components...' TYPE='application/x-oleobject'>");
+	document.write("<PARAM NAME='FileName' VALUE='" + FileName + "'>");
+	document.write("<PARAM NAME='AutoStart' VALUE='True'>");
+	document.write("<PARAM name='ShowControls' VALUE='true'>");
+	if (SoundOn)
+	{ document.write("<PARAM NAME='Mute' VALUE='false'>"); }
+	else
+	{ document.write("<PARAM NAME='Mute' VALUE='true'>"); }
+
+	document.write("<param name='ShowStatusBar' value='false'>");
+	document.write("<PARAM name='ShowDisplay' VALUE='false'>");
+	document.write("<param name='loop' value='true'>");
+	document.write("<param name='stretchToFit' value='true'>");
+	document.write("<param name='fullScreen' value='true'>");
+	//comment
+	//document.write("<PARAM NAME='Balance' VALUE='False'>");
+	//document.write("<PARAM NAME='DisplaySize' VALUE='True'>");
+	//document.write("<PARAM NAME='SelectionStart' VALUE='False'>");
+	//document.write("<PARAM NAME='SelectionEnd' VALUE='False'>");
+	//document.write("<PARAM NAME='ShowAudioControls' VALUE='True'>");
+	//document.write("<PARAM NAME='ShowPositionControls' VALUE='True'>");
+	//document.write("<PARAM NAME='Volume' VALUE='1'> ");
+	//document.write("<PARAM NAME='AudioStream' VALUE='False'>");
+	//document.write("<PARAM NAME='AutoSize' VALUE='False'> ");
+	//document.write("<PARAM NAME='AnimationAtStart' VALUE='False'>");
+	//document.write("<PARAM NAME='AllowScan' VALUE='False'> ");
+	//document.write("<PARAM NAME='AllowChangeDisplaySize' VALUE='False'>");
+	//document.write("<PARAM NAME='AutoRewind' VALUE='True'>");
+	//document.write("<PARAM NAME='BaseURL' VALUE=''>");
+	//document.write("<PARAM NAME='BufferingTime' VALUE='5'>");
+	//document.write("<PARAM NAME='CaptioningID' VALUE=''>");
+	//document.write("<PARAM NAME='ClickToPlay' VALUE='True'>"); 
+	//document.write("<PARAM NAME='CursorType' VALUE='0'>");
+	//document.write("<PARAM NAME='CurrentPosition' VALUE='True'>");
+	//document.write("<PARAM NAME='CurrentMarker' VALUE='True'>");
+	//document.write("<PARAM NAME='DefaultFrame' VALUE='mainframe'>");
+	//document.write("<PARAM NAME='DisplayBackColor' VALUE='True'>");
+	//document.write("<PARAM NAME='DisplayForeColor' VALUE='16777215'>");
+	//document.write("<PARAM NAME='DisplayMode' VALUE='1'>");
+	//document.write("<PARAM NAME='Enabled' VALUE='-1'>");
+	//document.write("<PARAM NAME='EnableContextMenu' VALUE='False'>");
+	//document.write("<PARAM NAME='EnablePositionControls' VALUE='False'>");
+	//document.write("<PARAM NAME='EnableFullScreenControls' VALUE='False'>");
+	//document.write("<PARAM NAME='EnableTracker' VALUE='False'>");
+	//document.write("<PARAM NAME='InvokeURLs' VALUE='False'>");
+	//document.write("<PARAM NAME='Language' VALUE='False'>");
+	//document.write("<PARAM NAME='PlayCount' VALUE='1'>");
+	//document.write("<PARAM NAME='PreviewMode' VALUE='False'>");
+	//document.write("<PARAM NAME='TransparentAtStart' VALUE='False'>");
+	//no comment
+	document.write("<EMBED TYPE='application/x-mplayer2' SRC='' NAME='MediaPlayer'");
+	document.write("WIDTH='100%' HEIGHT='100%' ShowControls='0' ShowStatusBar='0' ShowDisplay='0' autostart='0'> </EMBED>");
+	document.write("</OBJECT>");
+	document.write("</td>");
 }
+
+//Управление 
+function ApplyChoice(index) {
+
+	
+
+	if (index == undefined)
+	{
+		ListChoose = new Array();
+
+		for (i = 0; i < document.all.length; i++)
+		{
+
+			ctrltype = document.all(i).tagName;
+
+			if (ctrltype == 'INPUT')
+			{
+				if (document.all(i).checked)
+				{
+					ListChoose.push(document.all(i).value);
+				}
+			}
+
+		}
+
+	}
+
+	else
+
+	{
+		index_temp = find(ListChoose, index);
+
+		if (index_temp == -1) 
+		{
+			ListChoose.push(index);
+		}
+		else
+		{
+			//наверно надо будет удалить
+			ListChoose.splice(index_temp, 1);
+		}
+
+
+	}
+
+
+	//alert(ListChoose);
+
+	//return ctrls;
+
+}
+
+function GenerateTable(str)
+{
+	str.split
+}
+
+
+function ViewOption()
+{
+
+    Parent = ImagesList.GetParents();
+
+	//alert(Parent.length);
+
+	for (i = 0; i < Parent.length; i++)
+	{
+		document.write("<input type='checkbox' name='choice" + i + "' value='" + i + "' onClick ='ApplyChoice(" + i + ")'>" + Parent[i] + "");
+    }
+
+}
+
 
 
 function init() {
 
-
+    
+    
 
 
 //ImagesList.ShowParents();
@@ -252,18 +395,20 @@ function init() {
 </head>
 <body Onload="init()">
 <script>
-Parent = ImagesList.GetParents();
-alert(Parent.length);
-for (i=0;i<Parent.length;i++)
-{
- document.write("<input type='checkbox' name='"+i+ "' value='"+i+ "'>" +Parent [i] + "<br>");
-}
-
+    subdir(ImagesList, undefined, true);
+    ViewOption();
+    //Parent = ImagesList.GetParents();
+    //alert(Parent.length);
+    //for (i = 0; i < Parent.length; i++) {
+    //    document.write("<input type='checkbox' name='" + i + "' value='" + i + "'>" + Parent[i] + "<br>");
+    //}
+	//
 </script>
 
+<input id="Button1" type="button" value="button" onClick ="GenerateTable("v1,v2,v2,v3")"/>
 	<!-- input type="checkbox" name="vehicle" value="Bike"> I have a bike<br>
 	<input type="checkbox" name="vehicle" value="Car" checked> I have a car<br>
-	<input type="submit" value="Submit">
+	<input type="submit" value="Submit"><input id="Button1" type="button" value="button" />
 			<!--input type="button" onclick="" value="Play" />
 -->
 </body>
